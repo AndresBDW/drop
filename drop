@@ -1,0 +1,185 @@
+#!/bin/sh
+#
+# drop - script to upload files to a variety of filehostings using curl and netcat
+
+log() {
+    printf '\033[32m->\033[m %s\n' "$*"
+}
+
+err() {
+    printf '\033[31m->\033[m %s\n' "$*" >&2
+    exit 1
+}
+
+jl() {
+	printf '\n'
+}
+
+0x0st() {
+	[ $2 ] || err no input files.
+	if [ "$3" = --remote-url ]; then
+		log $(curl -F'url=$2' https://0x0.st)
+	elif [ "$3" = --hard-to-guess ]; then
+		log $(curl -F'file=@$2' -Fsecret= https://0x0.st)
+	elif [ "$3" = --remote-hard-to-guess ]; then
+		log $(curl -F'url=$2' -Fsecret= https://0x0.st)
+	elif [ "$3" = --retention ]; then
+		log $(curl -F'file=@$2' -Fexpires=$4 https://0x0.st)
+	elif [ "$3" = --remote-retention ]; then
+		log $(curl -F'url=$2' -Fexpires=$4 https://0x0.st)
+	elif [ "$3" = --hard-to-guess-retention ]; then
+		log $(curl -F'file=@$2' -Fexpires=$4 -Fsecret= https://0x0.st)
+	elif [ "$3" = --remote-hard-to-guess-retention ]; then
+		log $(curl -F'url=$2' -Fexpires=$4 -Fsecret= https://0x0.st)
+	elif [ "$2" = --help ]; then
+		log \$ drop 0x0.st \<file\>
+		log upload normal file
+		jl
+		log \$ drop 0x0.st \<url\> --remote-url
+		log upload from a remote url
+		jl
+		log \$ drop 0x0.st \<file\> --hard-to-guess
+		log upload file with a hard-to-guess url
+		jl
+		log \$ drop 0x0.st \<url\> --remote-hard-to-guess
+		log upload from a remote url with a hard-to-guess url
+		jl
+		log \$ drop 0x0.st \<file\> --retention \<hours\>
+		log upload file with retention time in hours
+		jl
+		log \$ drop 0x0.st \<url\> --remote-retention \<hours\>
+		log upload from a remote url with a retention time in hours
+		jl
+		log \$ drop 0x0.st \<file\> --hard-to-guess-retention \<hours\>
+		log upload file with a retention time in hours and a hard-to-guess url
+		jl
+		log \$ drop 0x0.st \<url\> --remote-hard-to-guess-retention \<hours\>
+		log upload from url with a retention time in hours and a hard-to-guess url
+		jl
+		log \$ drop 0x0.st --help
+		log shows help message
+	else
+		log $(curl -F "file=@$2" https://0x0.st)
+	fi
+}
+
+x0at() {
+	[ $2 ] || err no input files.
+	if [ "$3" = --keep-name ]; then
+		log $(curl -F "file=@$2" -F "keep_name=1" https://x0.at/)
+	elif [ "$2" = --help ]; then
+		log \$ drop x0.at \<file\>
+		log upload normal file
+		jl
+		log \$ drop x0.at \<file\> --keep-name
+		log upload normal file keeping filename
+		jl
+		log \$ drop x0.at --help
+		log shows help message
+	else
+		log $(curl -F "file=@$2" https://x0.at/)
+	fi
+}
+
+tempsh() {
+	[ $2 ] || err no input files.
+	if [ "$2" = --help ]; then
+		log \$ drop temp.sh \<file\>
+		log upload normal file
+		jl
+		log \$ drop temp.sh --help
+		log shows help message
+	else
+		log $(curl -F "file=@$2" https://temp.sh/upload)
+	fi
+}
+
+termbin() {
+	if [ "$3" = --send-text ]; then
+		log $(echo "$2" | nc termbin.com 9999)
+	elif [ "$3" = --send-file ]; then
+		log $(cat "$2" | nc termbin.com 9999)
+	elif [ "$2" = --send-list ]; then
+		log $(ls -la | nc termbin.com 9999)
+	elif [ "$2" = --help ]; then
+		log \$ drop termbin \<text\> --send-text
+		log this command will send the text into "text" slot.
+		jl
+		log \$ drop termbin \<file\> --send-file
+		log this command will send the file contents.
+		jl
+		log \$ drop termbin --send-list
+		log this command will send the list of files in the current directory.
+		jl
+		log \$ drop termbin --help
+		log shows help message
+	else
+		err no input files.
+	fi
+}
+
+uguuse() {
+        [ $2 ] || err no input files.
+        if [ "$2" = --help ]; then
+                log \$ drop uguu.se \<file\>
+                log upload normal file
+                jl
+                log \$ drop uguu.se --help
+                log shows help message
+        else
+                log $(curl -i -F "files[]=@$2" https://uguu.se/upload)
+        fi
+}
+
+catboxmoe() {
+    [ $2 ] || err no input files.
+    if [ "$3" = --remote-url ]; then
+        log $(curl -s -F reqtype=urlupload -F url=$2 https://catbox.moe/user/api.php)
+    elif [ "$2" = --help ]; then
+        log \$ drop catbox.moe \<file\>
+        log upload normal file to catbox.moe
+        jl
+        log \$ drop catbox.moe \<url\> --remote-url
+        log upload from a remote url to catbox.moe
+        jl
+        log \$ drop catbox-moe --help
+        log shows help message
+    else
+        log $(curl -s -F reqtype=fileupload -F fileToUpload=@$2 https://catbox.moe/user/api.php)
+    fi
+}
+
+main() {
+	if [ "$1" = "temp.sh" ]; then
+		tempsh $1 $2 $3 $4
+	elif [ "$1" = "0x0.st" ]; then
+		0x0st $1 $2 $3 $4
+	elif [ "$1" = "x0.at" ]; then
+		x0at $1 $2 $3 $4
+	elif [ "$1" = "uguu.se" ]; then
+		uguuse $1 $2 $3 $4
+	elif [ "$1" = "catbox.moe" ]; then
+		catboxmoe $1 $2 $3 $4
+	elif [ "$1" = "termbin" ]; then
+		[ $(command -v nc) ] || err no nc installed.
+		termbin $1 $2 $3 $4
+	elif [ "$1" = --help ]; then
+		log use:
+		log \$ drop \<filehost\> \<file/text\> \<extra parameters\>
+		jl
+		log filehost list:
+		log  temp.sh    - limit: 4gib     - expires: 3d
+		log  0x0.st     - limit: 512mib   - expires: 30d-1y
+		log  x0.at      - limit: 1024mib  - expires: 3d-100d
+		log  uguu.se    - limit: 128mib   - expires: 3h
+		log  catbox.moe - limit: 200mib   - expires: 2y \(without activity\)
+		log  termbin 
+	elif [ "$1" = --version ]; then
+		log drop 0.1
+	else
+		err no input files/filehost service, use --help.
+		
+	fi
+}
+
+main "$1" "$2" "$3" "$4"
