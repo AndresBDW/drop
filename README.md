@@ -1,14 +1,14 @@
-## drop
+# drop
 Script to upload files to a variety of filehostings using curl and netcat
 
 drop is a script that works uploading files to a variety of filehostings.
 
-# dependencies
+## dependencies
 
 * curl
 * netcat
 
-# filehostings list
+## filehostings list
 
 For now, there are few hosting options; more will be added later, or features will be added to the existing ones.
 
@@ -19,7 +19,7 @@ For now, there are few hosting options; more will be added later, or features wi
 * [catbox.moe](https://catbox.moe/)
 * [termbin](https://termbin.com/)
 
-# usage
+## usage
 
 ```sh
 $ drop --help
@@ -50,11 +50,11 @@ $ drop --version
 $
 ```
 
-# todo
+## todo
 
 - [ ] add more hostings
 - [ ] further develop the hosting for catbox.moe
 
-# license
+## license
 
 MIT License
