@@ -90,7 +90,7 @@ tempsh() {
 		log \$ drop temp.sh --help
 		log shows help message
 	else
-		log $(curl -F "file=@$2" https://temp.sh/upload)
+		log $(curl -f "file=@$2" https://temp.sh/upload)
 	fi
 }
 
@@ -149,6 +149,53 @@ catboxmoe() {
     fi
 }
 
+fileio() {
+	[ $2 ] || err no input files.
+	if [ "$3" = --expiration ]; then
+		curl -F "file=@$2" https://file.io/?expires=$4
+	elif [ "$3" = --direct-text ]; then
+		curl --data "text=$2" https://file.io
+	elif [ "$3" = --direct-text-expiration ]; then
+		curl --data "text=$2" https://file.io/?expires=$4
+	elif [ "$2" = --help ]; then
+		log \$ drop file.io \<file\>
+		log upload normal file to file.io
+		jl
+		log \$ drop file.io \<file\> --expiration \<1w/2M/3y\>
+		log upload file with expiration
+		log 1w = 1 week
+		log 2M = 2 months
+		log 3y = 3 years
+		jl
+		log \$ drop file.io \<text\> --direct-text
+		log upload direct text to file.io
+		jl
+		log \$ drop file.io \<text\> --direct-text-expiration \<1w/2M/3y\>
+		log upload direct text with expiration
+		log 1w = 1 week
+		log 2M = 2 months
+		log 3y = 3 years
+		jl
+		log \$ drop file.io --help
+		log shows help message
+	else
+		curl -F "file=@$2" https://file.io
+	fi
+}
+
+tmpfilelink() {
+	[ $2 ] || err no input files.
+	if [ "$2" = --help ]; then
+		log drop tmpfile.link \<file\>
+		log upload normal file to tmpfile.link
+		jl
+		log drop tmpfile.link --help
+		log shows help message
+	else
+		curl -X POST https://tmpfile.link/api/upload -F "file=@$2"
+	fi
+}
+
 main() {
 	if [ "$1" = "temp.sh" ]; then
 		tempsh $1 $2 $3 $4
@@ -160,6 +207,10 @@ main() {
 		uguuse $1 $2 $3 $4
 	elif [ "$1" = "catbox.moe" ]; then
 		catboxmoe $1 $2 $3 $4
+	elif [ "$1" = "file.io" ]; then
+		fileio $1 $2 $3 $4
+	elif [ "$1" = "tmpfile.link" ]; then
+		tmpfilelink $1 $2 $3 $4
 	elif [ "$1" = "termbin" ]; then
 		[ $(command -v nc) ] || err no nc installed.
 		termbin $1 $2 $3 $4
@@ -168,14 +219,16 @@ main() {
 		log \$ drop \<filehost\> \<file/text\> \<extra parameters\>
 		jl
 		log filehost list:
-		log  temp.sh    - limit: 4gib     - expires: 3d
-		log  0x0.st     - limit: 512mib   - expires: 30d-1y
-		log  x0.at      - limit: 1024mib  - expires: 3d-100d
-		log  uguu.se    - limit: 128mib   - expires: 3h
-		log  catbox.moe - limit: 200mib   - expires: 2y \(without activity\)
+		log  temp.sh      - limit: 4gib     - expires: 3d
+		log  0x0.st       - limit: 512mib   - expires: 30d-1y
+		log  x0.at        - limit: 1024mib  - expires: 3d-100d
+		log  uguu.se      - limit: 128mib   - expires: 3h
+		log  catbox.moe   - limit: 200mib   - expires: 2y \(without activity\)
+		log  file.io      - limit: 4gib     - expires: 14d
+		log  tmpfile.link - limit: 100mib   - expires: 7d
 		log  termbin 
 	elif [ "$1" = --version ]; then
-		log drop 0.1
+		log drop 0.2-rc1
 	else
 		err no input files/filehost service, use --help.
 		
