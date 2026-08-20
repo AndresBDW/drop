@@ -17,6 +17,8 @@ For now, there are few hosting options; more will be added later, or features wi
 * [x0.at](https://x0.at/)
 * [uguu.se](https://uguu.se/)
 * [catbox.moe](https://catbox.moe/)
+* [file.io](https://file.io/)
+* [tmpfile.link](https://tmpfile.link)
 * [termbin](https://termbin.com/)
 
 ## usage
@@ -32,6 +34,8 @@ $ drop --help
 -> x0.at - limit: 1024mib - expires: 3d-100d
 -> uguu.se - limit: 128mib - expires: 3h
 -> catbox.moe - limit: 200mib - expires: 2y (without activity)
+-> file.io - limit: 4gib - expires: 14d
+-> tmpfile.link - limit: 100mib - expires: 7d
 -> termbin
 
 # Upload to a service
@@ -46,7 +50,7 @@ $
 
 # See version
 $ drop --version
--> drop 0.1
+-> drop 0.2-rc2
 $
 ```
 

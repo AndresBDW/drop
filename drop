@@ -196,6 +196,25 @@ tmpfilelink() {
 	fi
 }
 
+tmpfilesorg(){
+	[ $2 ] || err no input files.
+	if [ "$3" = --expire ]; then
+		curl -F "file=@/path/to/test.jpg" -F "expire=$4" https://tmpfiles.org/api/v1/upload
+	elif [ "$2" = --help ]; then
+		log drop tmpfiles.org \<file\>
+		log upload normal file to tmpfiles.org
+		jl
+		log drop tmpfiles.org \<file\> --expire \<seconds\>
+		log upload file to tmpfiles.org with a expire time
+		log default: 3600s
+		jl
+		log drop tmpfiles.org --help
+		log shows help message
+	else
+		curl -F "file=@$2" https://tmpfiles.org/api/v1/upload
+	fi
+}
+
 main() {
 	if [ "$1" = "temp.sh" ]; then
 		tempsh $1 $2 $3 $4
@@ -211,6 +230,8 @@ main() {
 		fileio $1 $2 $3 $4
 	elif [ "$1" = "tmpfile.link" ]; then
 		tmpfilelink $1 $2 $3 $4
+	elif [ "$1" = "tmpfiles.org" ]; then
+		tmpfilesorg $1 $2 $3 $4
 	elif [ "$1" = "termbin" ]; then
 		[ $(command -v nc) ] || err no nc installed.
 		termbin $1 $2 $3 $4
@@ -226,9 +247,10 @@ main() {
 		log  catbox.moe   - limit: 200mib   - expires: 2y \(without activity\)
 		log  file.io      - limit: 4gib     - expires: 14d
 		log  tmpfile.link - limit: 100mib   - expires: 7d
+		log  tmpfiles.org - limit: 100mib   - expires: 24h
 		log  termbin 
 	elif [ "$1" = --version ]; then
-		log drop 0.2-rc1
+		log drop 0.2-rc2
 	else
 		err no input files/filehost service, use --help.
 		
