@@ -36,6 +36,7 @@ $ drop --help
 -> catbox.moe - limit: 200mib - expires: 2y (without activity)
 -> file.io - limit: 4gib - expires: 14d
 -> tmpfile.link - limit: 100mib - expires: 7d
+-> onlyfile.com - limit: 100mib - expires: no
 -> termbin
 
 # Upload to a service
@@ -50,7 +51,7 @@ $
 
 # See version
 $ drop --version
--> drop 0.2-rc2
+-> drop 0.2-rc3
 $
 ```
 
